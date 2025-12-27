@@ -1,4 +1,6 @@
 import { createDb } from "./db";
+import { RepositoryHubFactory } from "./repositories";
+import { EmployeeWithCity, EmployeeWithPosition } from "./repositories/types";
 
 const citySource = [
   { uuid: "3ba648aa-4498-43da-b29f-b83f37a25429", name: "Алматы" },
@@ -61,14 +63,25 @@ export interface IHRApp {
 
 export const createHRApp = (): IHRApp => {
   const db = createDb();
-
+  const hub = RepositoryHubFactory.build(db);
 
   return {
-    employeeWithCityList: async () => {
-      return [];
+    employeeWithCityList: async (): Promise<EmployeeWithCity[]> => {
+      const employees = await hub.employee.query({ where: {} });
+
+      return employees.map(employee => ({
+        firstName: employee.data.firstName,
+        city: employee.data.cityName,
+      }));
     },
-    employeeWithPositionList: async () => {
-      return [];
+    employeeWithPositionList: async (): Promise<EmployeeWithPosition[]> => {
+      const employees = await hub.employee.query({ where: {} });
+
+      return employees.map(employee => ({
+        firstName: employee.data.firstName,
+        position: employee.data.positionName,
+        division: employee.data.divisionName,
+      }));
     },
     update: async () => {
       // этот метод имплементировать не нужно
